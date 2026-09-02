@@ -1,31 +1,133 @@
-import type { Metadata } from "next";
-import { headers } from "next/headers";
+// app/layout.tsx
+
+import type {
+  Metadata,
+} from "next";
+
+import ShopHeader from "./components/ShopHeader";
+import ShopFooter from "./components/ShopFooter";
+import StaticNavigation from "./components/StaticNavigation";
+import { CartProvider } from "./components/CartProvider";
+
+import {
+  siteAssetPath,
+} from "../lib/site-path";
+
 import "./globals.css";
 
-export async function generateMetadata(): Promise<Metadata> {
-  const requestHeaders = await headers();
-  const host = requestHeaders.get("host") ?? "localhost:3000";
-  const protocol = requestHeaders.get("x-forwarded-proto") ?? "http";
-  const image = `${protocol}://${host}/og.png`;
-  const title = "Gian hàng điện tử | Bảo tàng Lịch sử Quốc gia";
-  const description = "Sản phẩm văn hóa sáng tạo từ di sản và hiện vật của Bảo tàng Lịch sử Quốc gia.";
-  return {
-    title,
+/* =========================================================
+   SITE METADATA
+   ========================================================= */
+
+const siteName =
+  "Bảo tàng Lịch sử Quốc gia";
+
+const title =
+  "Gian hàng điện tử";
+
+const description =
+  "Khám phá các sản phẩm văn hóa sáng tạo được phát triển từ hiện vật, tư liệu và câu chuyện lịch sử của Bảo tàng Lịch sử Quốc gia.";
+
+export const metadata:
+  Metadata = {
+  /**
+   * Chỉ đặt origin tại đây.
+   *
+   * Không đặt /shop-merch/
+   * vì các asset đã được
+   * siteAssetPath() thêm basePath.
+   */
+  metadataBase:
+    new URL(
+      "https://vtcrdcenter.github.io/",
+    ),
+
+  title: {
+    default:
+      `${title} | ${siteName}`,
+
+    template:
+      `%s | ${siteName}`,
+  },
+
+  description,
+
+  icons: {
+    icon:
+      siteAssetPath(
+        "/favicon.svg",
+      ),
+
+    shortcut:
+      siteAssetPath(
+        "/favicon.svg",
+      ),
+  },
+
+  openGraph: {
+    title:
+      `${title} | ${siteName}`,
+
     description,
-    icons: { icon: "/favicon.svg", shortcut: "/favicon.svg" },
-    openGraph: { title, description, images: [image] },
-    twitter: { card: "summary_large_image", title, description, images: [image] },
-  };
-}
+
+    type:
+      "website",
+
+    images: [
+      siteAssetPath(
+        "/og.png",
+      ),
+    ],
+  },
+
+  twitter: {
+    card:
+      "summary_large_image",
+
+    title:
+      `${title} | ${siteName}`,
+
+    description,
+
+    images: [
+      siteAssetPath(
+        "/og.png",
+      ),
+    ],
+  },
+};
+
+/* =========================================================
+   ROOT LAYOUT
+   ========================================================= */
 
 export default function RootLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode;
+  children:
+    React.ReactNode;
 }>) {
   return (
     <html lang="vi">
-      <body>{children}</body>
+      <body>
+        <StaticNavigation />
+        <a
+          href="#main-content"
+          className="skip-link"
+        >
+          Chuyển đến nội dung
+        </a>
+
+        <CartProvider>
+          <ShopHeader />
+
+          <div id="main-content">
+            {children}
+          </div>
+
+          <ShopFooter />
+        </CartProvider>
+      </body>
     </html>
   );
 }
